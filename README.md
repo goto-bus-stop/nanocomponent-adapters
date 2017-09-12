@@ -17,7 +17,7 @@ frameworks support are very welcome!
 - Cycle
 - Vue
 - Inferno
-- Custom Elements (webcomponents)
+- [Custom Elements (webcomponents)](#custom-elements)
 - Elm
 
 ## Preact
@@ -141,6 +141,52 @@ function mainView (state, emit) {
     </section>
   `
 }
+```
+
+### Custom Elements
+
+For custom elements, the [observed attributes](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Custom_Elements#Observed_attributes) need to be configured in the second parameter in order for changes to trigger rerenders.
+
+```js
+var toCustomElement = require('nanocomponent-adapters/custom-element')
+var Nanocomponent = require('nanocomponent')
+var html = require('bel')
+
+class Button extends Nanocomponent {
+  constructor () {
+    super()
+    this.color = null
+  }
+
+  handleClick () {
+    console.log('choo choo!')
+  }
+
+  createElement ({ color }) {
+    this.color = color
+    return html`
+      <button onclick=${this.handleClick} style="background-color: ${color}">
+        Click Me
+      </button>
+    `
+  }
+
+  update ({ color }) {
+    return color !== this.color
+  }
+}
+
+var CustomButton = toCustomElement(Button, [ 'color' ])
+customElements.define('custom-button', CustomButton)
+
+var el = document.createElement('custom-button')
+el.setAttribute('color', 'orange')
+document.appendChild(el)
+// Or use bel!
+var el = html`
+  <custom-button color="pink"></custom-button>
+`
+document.appendChild(el)
 ```
 
 ## See Also
